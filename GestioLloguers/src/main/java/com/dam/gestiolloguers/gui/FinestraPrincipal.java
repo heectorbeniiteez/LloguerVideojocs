@@ -12,7 +12,9 @@ import com.dam.gestiolloguers.gui.tablemodels.LloguersTableModel;
 import com.dam.gestiolloguers.logic.LogicaNegoci;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 /**
  *
@@ -231,6 +233,8 @@ public class FinestraPrincipal extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // L'aplicació funciona en català: així es carreguen els textos de Bundle_ca
+        Locale.setDefault(Locale.forLanguageTag("ca-ES"));
         LogicaNegoci.carregarDadesInicials();
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -248,6 +252,15 @@ public class FinestraPrincipal extends javax.swing.JFrame {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+
+        // Textos dels botons i títols dels missatges (JOptionPane) en català
+        UIManager.put("OptionPane.okButtonText", "D'acord");
+        UIManager.put("OptionPane.cancelButtonText", "Cancel·lar");
+        UIManager.put("OptionPane.yesButtonText", "Sí");
+        UIManager.put("OptionPane.noButtonText", "No");
+        UIManager.put("OptionPane.messageDialogTitle", "Missatge");
+        UIManager.put("OptionPane.inputDialogTitle", "Entrada");
+        UIManager.put("OptionPane.titleText", "Selecciona una opció");
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FinestraPrincipal().setVisible(true));
