@@ -4,6 +4,14 @@
  */
 package com.dam.gestiolloguers.gui;
 
+import com.dam.gestiolloguers.dto.Joc;
+import com.dam.gestiolloguers.dto.Lloguer;
+import com.dam.gestiolloguers.dto.Usuari;
+import com.dam.gestiolloguers.logic.LogicaNegoci;
+import java.time.LocalDate;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+
 /**
  *
  * @author hecto
@@ -18,6 +26,65 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
     public DialegRegistrarLloguer(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        carregarFormulari();
+    }
+
+    private void carregarFormulari() {
+        // Número de registre: el següent que tocarà
+        txtNumRegistre.setText(String.format("%02d", LogicaNegoci.getSeguentNumRegistre()));
+
+        // Dates automàtiques: avui i d'aquí a 7 dies (no es poden modificar)
+        LocalDate avui = LocalDate.now();
+        dcDataInici.setDate(java.sql.Date.valueOf(avui));
+        dcDataTornada.setDate(java.sql.Date.valueOf(avui.plusDays(Lloguer.DIES_LLOGUER)));
+        dcDataInici.setDateFormatString("dd/MM/yyyy");
+        dcDataTornada.setDateFormatString("dd/MM/yyyy");
+        dcDataInici.setEnabled(false);
+        dcDataTornada.setEnabled(false);
+
+        // Omplir els combos amb els usuaris i jocs
+        for (Usuari u : LogicaNegoci.getUsuaris()) {
+            cmbUsuari.addItem(u);
+        }
+        for (Joc j : LogicaNegoci.getJocs()) {
+            cmbJoc.addItem(j);
+        }
+
+        // Cada vegada que es canvia de joc, s'actualitza la informació i les plataformes
+        cmbJoc.addActionListener(e -> actualitzarJoc());
+        actualitzarJoc();
+    }
+
+    private void actualitzarJoc() {
+        Joc joc = (Joc) cmbJoc.getSelectedItem();
+        if (joc == null) {
+            return;
+        }
+
+        // Informació del joc
+        lblGenere.setText(joc.getGenere());
+        lblUnitatsPS5.setText(String.valueOf(joc.getUnitats("PS5")));
+        lblUnitatsXbox.setText(String.valueOf(joc.getUnitats("Xbox")));
+        lblUnitatsPC.setText(String.valueOf(joc.getUnitats("PC")));
+        lblUnitatsSwitch2.setText(String.valueOf(joc.getUnitats("Switch 2")));
+
+        // Plataformes: només es poden triar si hi ha unitats
+        actualitzarRadio(rbPC, "PC", joc);
+        actualitzarRadio(rbPS5, "PS5", joc);
+        actualitzarRadio(rbXbox, "Xbox", joc);
+        actualitzarRadio(rbSwitch2, "Switch 2", joc);
+
+        grupPlataformes.clearSelection();
+    }
+
+    private void actualitzarRadio(JRadioButton radio, String plataforma, Joc joc) {
+        int unitats = joc.getUnitats(plataforma);
+        if (unitats == 1) {
+            radio.setText(plataforma + "   (1 unitat disponible)");
+        } else {
+            radio.setText(plataforma + "   (" + unitats + " unitats disponibles)");
+        }
+        radio.setEnabled(unitats > 0);
     }
 
     /**
@@ -77,14 +144,10 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("DialegRegistrarLloguer.jLabel2.text")); // NOI18N
 
-        cmbUsuari.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         btnSeleccionarUsuari.setText(bundle.getString("DialegRegistrarLloguer.btnSeleccionarUsuari.text")); // NOI18N
         btnSeleccionarUsuari.addActionListener(this::btnSeleccionarUsuariActionPerformed);
 
         jLabel3.setText(bundle.getString("DialegRegistrarLloguer.jLabel3.text")); // NOI18N
-
-        cmbJoc.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         btnSeleccionarJoc.setText(bundle.getString("DialegRegistrarLloguer.btnSeleccionarJoc.text")); // NOI18N
         btnSeleccionarJoc.addActionListener(this::btnSeleccionarJocActionPerformed);
@@ -116,9 +179,8 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
                         .addComponent(cmbUsuari, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSeleccionarUsuari))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(dcDataInici, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-                        .addComponent(dcDataTornada, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(dcDataInici, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                    .addComponent(dcDataTornada, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -284,6 +346,7 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
         btnConfirmar.addActionListener(this::btnConfirmarActionPerformed);
 
         btnCancelar.setText(bundle.getString("DialegRegistrarLloguer.btnCancelar.text")); // NOI18N
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -330,11 +393,21 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
     }//GEN-LAST:event_txtNumRegistreActionPerformed
 
     private void btnSeleccionarUsuariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarUsuariActionPerformed
-        // TODO add your handling code here:
+        Object[] usuaris = LogicaNegoci.getUsuaris().toArray();
+                Object triat = JOptionPane.showInputDialog(this, "Tria un usuari:", "Seleccionar usuari",
+                        JOptionPane.QUESTION_MESSAGE, null, usuaris, cmbUsuari.getSelectedItem());
+                if (triat != null) {
+                    cmbUsuari.setSelectedItem(triat);
+        }
     }//GEN-LAST:event_btnSeleccionarUsuariActionPerformed
 
     private void btnSeleccionarJocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarJocActionPerformed
-        // TODO add your handling code here:
+        Object[] jocs = LogicaNegoci.getJocs().toArray();
+        Object triat = JOptionPane.showInputDialog(this, "Tria un joc:", "Seleccionar joc",
+                JOptionPane.QUESTION_MESSAGE, null, jocs, cmbJoc.getSelectedItem());
+        if (triat != null) {
+            cmbJoc.setSelectedItem(triat);
+        }
     }//GEN-LAST:event_btnSeleccionarJocActionPerformed
 
     private void rbPCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbPCActionPerformed
@@ -346,8 +419,32 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
     }//GEN-LAST:event_rbXboxActionPerformed
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-        // TODO add your handling code here:
+                Usuari usuari = (Usuari) cmbUsuari.getSelectedItem();
+        Joc joc = (Joc) cmbJoc.getSelectedItem();
+
+        String plataforma = null;
+        if (rbPC.isSelected()) {
+            plataforma = "PC";
+        } else if (rbPS5.isSelected()) {
+            plataforma = "PS5";
+        } else if (rbXbox.isSelected()) {
+            plataforma = "Xbox";
+        } else if (rbSwitch2.isSelected()) {
+            plataforma = "Switch 2";
+        }
+
+        try {
+            LogicaNegoci.registrarLloguer(usuari, joc, plataforma, LocalDate.now());
+            JOptionPane.showMessageDialog(this, "Lloguer registrat correctament.");
+            dispose();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnConfirmarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -391,8 +488,8 @@ public class DialegRegistrarLloguer extends javax.swing.JDialog {
     private javax.swing.JButton btnConfirmar;
     private javax.swing.JButton btnSeleccionarJoc;
     private javax.swing.JButton btnSeleccionarUsuari;
-    private javax.swing.JComboBox<String> cmbJoc;
-    private javax.swing.JComboBox<String> cmbUsuari;
+    private javax.swing.JComboBox<com.dam.gestiolloguers.dto.Joc> cmbJoc;
+    private javax.swing.JComboBox<com.dam.gestiolloguers.dto.Usuari> cmbUsuari;
     private com.toedter.calendar.JDateChooser dcDataInici;
     private com.toedter.calendar.JDateChooser dcDataTornada;
     private javax.swing.ButtonGroup grupPlataformes;

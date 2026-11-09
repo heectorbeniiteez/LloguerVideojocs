@@ -4,12 +4,15 @@
  */
 package com.dam.gestiolloguers.gui;
 
+import com.dam.gestiolloguers.dto.Joc;
 import com.dam.gestiolloguers.dto.Lloguer;
+import com.dam.gestiolloguers.dto.Usuari;
 import com.dam.gestiolloguers.gui.tablemodels.ColorsRenderer;
 import com.dam.gestiolloguers.gui.tablemodels.LloguersTableModel;
 import com.dam.gestiolloguers.logic.LogicaNegoci;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -26,14 +29,72 @@ public class FinestraPrincipal extends javax.swing.JFrame {
         initComponents();
         taulaLloguers.setDefaultRenderer(Object.class, new ColorsRenderer());
         taulaLloguers.setRowHeight(25);
+        menuBorrarUsuari.addActionListener(e -> borrarUsuari());
+        menuBorrarJoc.addActionListener(e -> borrarJoc());
         refrescarTaula();
     }
-    
+
     public void refrescarTaula() {
         ArrayList<Lloguer> llista = new ArrayList<>(LogicaNegoci.getLloguers());
         Collections.reverse(llista);
         taulaLloguers.setModel(new LloguersTableModel(llista));
         lblTotal.setText("Total de lloguers: " + llista.size());
+    }
+
+    private void borrarUsuari() {
+        Object[] usuaris = LogicaNegoci.getUsuaris().toArray();
+        if (usuaris.length == 0) {
+            JOptionPane.showMessageDialog(this, "No hi ha cap usuari per eliminar.");
+            return;
+        }
+
+        Object triat = JOptionPane.showInputDialog(this, "Tria l'usuari que vols eliminar:", "Borrar usuari",
+                JOptionPane.QUESTION_MESSAGE, null, usuaris, usuaris[0]);
+        if (triat == null) {
+            return;
+        }
+
+        int resposta = JOptionPane.showConfirmDialog(this, "Segur que vols eliminar l'usuari " + triat + "?",
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (resposta != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            LogicaNegoci.eliminarUsuari((Usuari) triat);
+            JOptionPane.showMessageDialog(this, "Usuari eliminat correctament.");
+            refrescarTaula();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void borrarJoc() {
+        Object[] jocs = LogicaNegoci.getJocs().toArray();
+        if (jocs.length == 0) {
+            JOptionPane.showMessageDialog(this, "No hi ha cap joc per eliminar.");
+            return;
+        }
+
+        Object triat = JOptionPane.showInputDialog(this, "Tria el joc que vols eliminar:", "Borrar joc",
+                JOptionPane.QUESTION_MESSAGE, null, jocs, jocs[0]);
+        if (triat == null) {
+            return;
+        }
+
+        int resposta = JOptionPane.showConfirmDialog(this, "Segur que vols eliminar el joc " + triat + "?",
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (resposta != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            LogicaNegoci.eliminarJoc((Joc) triat);
+            JOptionPane.showMessageDialog(this, "Joc eliminat correctament.");
+            refrescarTaula();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     /**
@@ -139,17 +200,24 @@ public class FinestraPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void menuRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRegistrarActionPerformed
-        // TODO add your handling code here:
+        DialegRegistrarLloguer dialeg = new DialegRegistrarLloguer(this, true);
+        dialeg.setLocationRelativeTo(this);
+        dialeg.setVisible(true);
+        refrescarTaula();
     }//GEN-LAST:event_menuRegistrarActionPerformed
 
     private void menuTornarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuTornarActionPerformed
-        // TODO add your handling code here:
+        DialegTornarLloguer dialeg = new DialegTornarLloguer(this, true);
+        dialeg.setLocationRelativeTo(this);
+        dialeg.setVisible(true);
+        refrescarTaula();
     }//GEN-LAST:event_menuTornarActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        LogicaNegoci.carregarDadesInicials();
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

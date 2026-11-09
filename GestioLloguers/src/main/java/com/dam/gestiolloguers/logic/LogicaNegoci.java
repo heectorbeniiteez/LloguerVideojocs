@@ -77,7 +77,44 @@ public class LogicaNegoci {
         }
         return actius;
     }
-        public static void carregarDadesInicials() {
+
+    public static void afegirUsuari(Usuari usuari) {
+        usuaris.add(usuari);
+    }
+
+    public static void eliminarUsuari(Usuari usuari) throws Exception {
+        if (usuari == null) {
+            throw new Exception("Has de seleccionar un usuari.");
+        }
+
+        for (Lloguer l : lloguers) {
+            if (!l.isRetornat() && l.getUsuari() == usuari) {
+                throw new Exception("No es pot eliminar l'usuari " + usuari + " perquè té lloguers actius.");
+            }
+        }
+
+        usuaris.remove(usuari);
+    }
+
+    public static void afegirJoc(Joc joc) {
+        jocs.add(joc);
+    }
+
+    public static void eliminarJoc(Joc joc) throws Exception {
+        if (joc == null) {
+            throw new Exception("Has de seleccionar un joc.");
+        }
+
+        for (Lloguer l : lloguers) {
+            if (!l.isRetornat() && l.getJoc() == joc) {
+                throw new Exception("No es pot eliminar el joc " + joc.getNom() + " perquè té lloguers actius.");
+            }
+        }
+
+        jocs.remove(joc);
+    }
+
+    public static void carregarDadesInicials() {
         Usuari u1 = new Usuari("Laura", "García", "Pons", "12345678A", "600111222");
         Usuari u2 = new Usuari("Marc", "López", "Ferrer", "87654321B", "600333444");
         usuaris.add(u1);
