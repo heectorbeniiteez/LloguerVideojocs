@@ -78,7 +78,12 @@ public class LogicaNegoci {
         return actius;
     }
 
-    public static void afegirUsuari(Usuari usuari) {
+    public static void afegirUsuari(Usuari usuari) throws Exception {
+        for (Usuari u : usuaris) {
+            if (u.getDni().equalsIgnoreCase(usuari.getDni())) {
+                throw new Exception("Ja existeix un usuari amb el DNI " + usuari.getDni() + ".");
+            }
+        }
         usuaris.add(usuari);
     }
 
@@ -96,7 +101,12 @@ public class LogicaNegoci {
         usuaris.remove(usuari);
     }
 
-    public static void afegirJoc(Joc joc) {
+    public static void afegirJoc(Joc joc) throws Exception {
+        for (Joc j : jocs) {
+            if (j.getNom().equalsIgnoreCase(joc.getNom())) {
+                throw new Exception("Ja existeix un joc amb el nom " + joc.getNom() + ".");
+            }
+        }
         jocs.add(joc);
     }
 

@@ -29,7 +29,9 @@ public class FinestraPrincipal extends javax.swing.JFrame {
         initComponents();
         taulaLloguers.setDefaultRenderer(Object.class, new ColorsRenderer());
         taulaLloguers.setRowHeight(25);
+        menuCrearUsuari.addActionListener(e -> crearUsuari());
         menuBorrarUsuari.addActionListener(e -> borrarUsuari());
+        menuCrearJoc.addActionListener(e -> crearJoc());
         menuBorrarJoc.addActionListener(e -> borrarJoc());
         refrescarTaula();
     }
@@ -39,6 +41,12 @@ public class FinestraPrincipal extends javax.swing.JFrame {
         Collections.reverse(llista);
         taulaLloguers.setModel(new LloguersTableModel(llista));
         lblTotal.setText("Total de lloguers: " + llista.size());
+    }
+
+    private void crearUsuari() {
+        DialegCrearUsuari dialeg = new DialegCrearUsuari(this, true);
+        dialeg.setLocationRelativeTo(this);
+        dialeg.setVisible(true);
     }
 
     private void borrarUsuari() {
@@ -67,6 +75,12 @@ public class FinestraPrincipal extends javax.swing.JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void crearJoc() {
+        DialegCrearJoc dialeg = new DialegCrearJoc(this, true);
+        dialeg.setLocationRelativeTo(this);
+        dialeg.setVisible(true);
     }
 
     private void borrarJoc() {
