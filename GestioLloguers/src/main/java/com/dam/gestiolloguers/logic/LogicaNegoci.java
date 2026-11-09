@@ -77,4 +77,29 @@ public class LogicaNegoci {
         }
         return actius;
     }
+        public static void carregarDadesInicials() {
+        Usuari u1 = new Usuari("Laura", "García", "Pons", "12345678A", "600111222");
+        Usuari u2 = new Usuari("Marc", "López", "Ferrer", "87654321B", "600333444");
+        usuaris.add(u1);
+        usuaris.add(u2);
+
+        Joc j1 = new Joc("Minecraft", "Aventura");
+        j1.setUnitats("PS5", 2);
+        j1.setUnitats("Switch 2", 1);
+
+        Joc j2 = new Joc("Cyberpunk 2077", "Acció");
+        j2.setUnitats("Xbox", 1);
+        j2.setUnitats("PC", 2);
+
+        jocs.add(j1);
+        jocs.add(j2);
+
+        try {
+            // Aquest lloguer va començar fa 10 dies, per tant surt fora de termini (vermell)
+            registrarLloguer(u1, j1, "Switch 2", LocalDate.now().minusDays(10));
+            registrarLloguer(u2, j2, "PC", LocalDate.now());
+        } catch (Exception e) {
+            System.out.println("Error carregant les dades inicials: " + e.getMessage());
+        }
+    }
 }

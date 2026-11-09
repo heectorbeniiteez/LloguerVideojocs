@@ -5,6 +5,7 @@
 package com.dam.gestiolloguers.gui;
 
 import com.dam.gestiolloguers.dto.Lloguer;
+import com.dam.gestiolloguers.gui.tablemodels.ColorsRenderer;
 import com.dam.gestiolloguers.gui.tablemodels.LloguersTableModel;
 import com.dam.gestiolloguers.logic.LogicaNegoci;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public class FinestraPrincipal extends javax.swing.JFrame {
      */
     public FinestraPrincipal() {
         initComponents();
+        taulaLloguers.setDefaultRenderer(Object.class, new ColorsRenderer());
+        taulaLloguers.setRowHeight(25);
         refrescarTaula();
     }
     
